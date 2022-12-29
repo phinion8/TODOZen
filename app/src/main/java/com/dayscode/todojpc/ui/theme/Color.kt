@@ -18,6 +18,15 @@ val LightGray = Color(0xFFEBEBEB)
 val MediumGray = Color(0xFF8D8D8D)
 val DarkGray = Color(0xFF2E2E2E)
 
+val androidx.compose.material.Colors.taskItemColor: Color
+@Composable
+get() = if (!isSystemInDarkTheme()) DarkGray else Color.White
+
+
+val androidx.compose.material.Colors.taskItemBackgroundColor: Color
+    @Composable
+    get() = if (!isSystemInDarkTheme()) Color.White else DarkGray
+
 val androidx.compose.material.Colors.topAppBarContentColor: Color
 @Composable
 get() = if (!isSystemInDarkTheme()) Color.White else LightGray
