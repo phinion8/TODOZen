@@ -25,7 +25,7 @@ get() = if (!isSystemInDarkTheme()) DarkGray else Color.White
 
 val androidx.compose.material.Colors.taskItemBackgroundColor: Color
     @Composable
-    get() = if (!isSystemInDarkTheme()) Color.White else DarkGray
+    get() = if (!isSystemInDarkTheme()) Color.White else background
 
 val androidx.compose.material.Colors.topAppBarContentColor: Color
 @Composable

@@ -1,6 +1,7 @@
 package com.dayscode.todojpc.ui.screens.list
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -9,9 +10,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dayscode.todojpc.data.viewmodels.SharedViewModel
@@ -25,6 +29,13 @@ fun ListScreen(
     sharedViewModel: SharedViewModel
 ) {
 
+    LaunchedEffect(key1 = true ){
+        Log.d("ListScreen", "Launched Effect Triggered")
+        sharedViewModel.getAllTasks()
+    }
+
+    //collect as state function collect the value as the state flow and it will update the all tasks variable when there is a change in the database
+    val allTasks by sharedViewModel.allTasks.collectAsState()
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppState
     val searchTextState: String by sharedViewModel.searchTextState
 
@@ -34,6 +45,7 @@ fun ListScreen(
         },
         content = {
 
+                  ListContent(tasks = allTasks, navigateToTaskScreen = navigateToTaskScreen)
         },
         floatingActionButton = {
             ListFab(OnFabClicked = navigateToTaskScreen)

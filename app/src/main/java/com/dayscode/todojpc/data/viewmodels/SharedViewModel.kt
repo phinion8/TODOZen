@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dayscode.todojpc.data.models.ToDoTask
 import com.dayscode.todojpc.data.repositories.ToDoRepository
+import com.dayscode.todojpc.util.RequestState
 import com.dayscode.todojpc.util.SearchAppBarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,15 +24,24 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
     //This one triggered when the text get changed inside the search text field
     val searchTextState: MutableState<String> = mutableStateOf("")
 
-    private val _allTasks = MutableStateFlow<List<ToDoTask>>(emptyList())
+    private val _allTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
 
-    val allTasks: StateFlow<List<ToDoTask>> = _allTasks
+    val allTasks: StateFlow<RequestState<List<ToDoTask>>> = _allTasks
 
         fun getAllTasks(){
-            viewModelScope.launch {
-                repository.getAllTasks.collect{
-                    _allTasks.value = it
+            _allTasks.value = RequestState.Loading
+
+            try {
+
+                viewModelScope.launch {
+                    repository.getAllTasks.collect{
+                        _allTasks.value = RequestState.Success(it)
+                    }
                 }
+
+            }catch (e: Exception){
+                _allTasks.value = RequestState.Error(e)
             }
+
         }
 }
