@@ -34,10 +34,14 @@ fun ListScreen(
         sharedViewModel.getAllTasks()
     }
 
+    val action by sharedViewModel.action
+
     //collect as state function collect the value as the state flow and it will update the all tasks variable when there is a change in the database
     val allTasks by sharedViewModel.allTasks.collectAsState()
     val searchAppBarState: SearchAppBarState by sharedViewModel.searchAppState
     val searchTextState: String by sharedViewModel.searchTextState
+
+    sharedViewModel.handleDatabaseActions(action)
 
     Scaffold(
         topBar = {
