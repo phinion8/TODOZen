@@ -21,10 +21,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.dayscode.todojpc.components.DisplayAlertDialog
 import com.dayscode.todojpc.components.PriorityItem
 import com.dayscode.todojpc.data.models.Priority
 import com.dayscode.todojpc.data.viewmodels.SharedViewModel
 import com.dayscode.todojpc.ui.theme.*
+import com.dayscode.todojpc.util.Action
 import com.dayscode.todojpc.util.SearchAppBarState
 import com.dayscode.todojpc.util.TrailingIconState
 import kotlinx.coroutines.processNextEventInCurrentThread
@@ -39,12 +41,30 @@ fun ListAppBar(
 
 ) {
 
+    var openDialog by remember {
+        mutableStateOf(false)
+    }
+
+    DisplayAlertDialog(
+        title = "Remove everything?",
+        message = "Are you sure you want to remove everything?",
+        openDialog = openDialog,
+        closeDialog = { openDialog = false },
+        onYesClicked = {
+            sharedViewModel.action.value = Action.DELETE_ALL
+        })
+
     when (searchAppBarState) {
         SearchAppBarState.CLOSED -> {
             DefaultListAppBar(onSearchClicked = {
                 sharedViewModel.searchAppState.value = SearchAppBarState.OPENED
 
-            }, onSortClicked = { }, onDeleteClicked = {})
+            }, onSortClicked = { }, onDeleteClicked = {
+
+                openDialog = true
+
+
+            })
         }
         else -> {
             SearchAppBar(text = searchTextState, onTextChange = {
@@ -52,7 +72,9 @@ fun ListAppBar(
             }, onCloseClicked = {
                 sharedViewModel.searchAppState.value = SearchAppBarState.CLOSED
                 sharedViewModel.searchTextState.value = ""
-            }, onSearchClicked = {})
+            }, onSearchClicked = {
+                sharedViewModel.searchDatabase(searchQuery = it)
+            })
         }
     }
 
@@ -218,23 +240,23 @@ fun SearchAppBar(
             },
             trailingIcon = {
                 IconButton(onClick = {
-                    when(trailingIconState){
-                        TrailingIconState.READY_TO_DELETE ->{
+                    when (trailingIconState) {
+                        TrailingIconState.READY_TO_DELETE -> {
                             onTextChange("")
                             trailingIconState = TrailingIconState.READY_TO_CLOSE
                         }
-                        TrailingIconState.READY_TO_CLOSE ->{
-                            if (text.isNotEmpty()){
+                        TrailingIconState.READY_TO_CLOSE -> {
+                            if (text.isNotEmpty()) {
                                 onTextChange("")
-                            }else{
+                            } else {
                                 onCloseClicked()
                                 trailingIconState = TrailingIconState.READY_TO_DELETE
                             }
                         }
                     }
-                    if(text.isNotEmpty()){
+                    if (text.isNotEmpty()) {
                         onTextChange("")
-                    }else{
+                    } else {
                         onCloseClicked()
                     }
                 }) {

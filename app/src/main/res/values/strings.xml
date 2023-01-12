@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">To-Do Compose</string>
+    <string name="delete_task">Remove </string>
+    <string name="delete_task_confirmation">Are you sure you want to remove </string>
 </resources>

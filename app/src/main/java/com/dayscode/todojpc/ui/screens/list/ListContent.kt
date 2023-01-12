@@ -1,5 +1,6 @@
 package com.dayscode.todojpc.ui.screens.list
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,22 +20,40 @@ import com.dayscode.todojpc.data.models.Priority
 import com.dayscode.todojpc.data.models.ToDoTask
 import com.dayscode.todojpc.ui.theme.*
 import com.dayscode.todojpc.util.RequestState
+import com.dayscode.todojpc.util.SearchAppBarState
 
 
 @Composable
 fun ListContent(
-    tasks: RequestState<List<ToDoTask>>,
-    navigateToTaskScreen: (taskId: Int) -> Unit
+    allTasks: RequestState<List<ToDoTask>>,
+    navigateToTaskScreen: (taskId: Int) -> Unit,
+    searchAppBarState: SearchAppBarState,
+    searchedTasks: RequestState<List<ToDoTask>>
 ) {
 
-    if (tasks is RequestState.Success){
-        if (tasks.data.isEmpty()){
-            EmptyContent()
-        }else{
-            DisplayTasks(tasks = tasks.data, navigateToTaskScreen = navigateToTaskScreen)
+    if (searchAppBarState == SearchAppBarState.TRIGGERED){
+        if (searchedTasks is RequestState.Success){
+            HandleListContent(tasks = searchedTasks.data, navigateToTaskScreen = navigateToTaskScreen)
         }
+        }else{
+            if (allTasks is RequestState.Success){
+                Log.d("DBPS", searchedTasks.toString())
+                HandleListContent(tasks = allTasks.data, navigateToTaskScreen = navigateToTaskScreen)
+            }
     }
 
+}
+
+@Composable
+fun HandleListContent(
+    tasks: List<ToDoTask>,
+    navigateToTaskScreen: (taskId: Int) -> Unit
+) {
+    if (tasks.isEmpty()){
+        EmptyContent()
+    }else{
+        DisplayTasks(tasks = tasks, navigateToTaskScreen = navigateToTaskScreen)
+    }
 }
 
 @Composable
@@ -58,7 +77,7 @@ fun DisplayTasks(
 @Composable
 fun TaskItem(
     toDoTask: ToDoTask,
-    //Whenever we click on the task from the list of the tasks then there id will be passed in the taskId
+    //Whenever we click on the task from the list of the allTasks then there id will be passed in the taskId
     navigateToTaskScreen: (taskId: Int) -> Unit
 ) {
     Surface(modifier = Modifier.fillMaxWidth(),

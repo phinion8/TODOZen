@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Query
 import com.dayscode.todojpc.data.models.Priority
 import com.dayscode.todojpc.data.models.ToDoTask
 import com.dayscode.todojpc.data.repositories.ToDoRepository
@@ -42,6 +43,27 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
 
     val allTasks: StateFlow<RequestState<List<ToDoTask>>> = _allTasks
 
+    private val _searchedTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+
+    val searchedTasks: StateFlow<RequestState<List<ToDoTask>>> = _searchedTasks
+
+    fun searchDatabase(searchQuery: String){
+        _searchedTasks.value = RequestState.Loading
+        try {
+            viewModelScope.launch {
+                repository.searchDatabase(searchQuery = "%$searchQuery%")
+                    .collect{ searchedTasks->
+
+                        _searchedTasks.value = RequestState.Success(searchedTasks)
+
+                    }
+            }
+        }catch (e: Exception){
+            _searchedTasks.value = RequestState.Error(e)
+        }
+        searchAppState.value = SearchAppBarState.TRIGGERED
+    }
+
     fun getAllTasks() {
         _allTasks.value = RequestState.Loading
 
@@ -68,6 +90,39 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
             )
             repository.addTask(toDoTask)
         }
+        searchAppState.value = SearchAppBarState.CLOSED
+    }
+
+    private fun updateTask(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val toDoTask = ToDoTask(
+                id = id.value,
+                title = title.value,
+                description = description.value,
+                priority = priority.value
+            )
+
+            repository.updateTask(toDoTask)
+        }
+    }
+
+    private fun deleteTask(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val toDoTask = ToDoTask(
+                id = id.value,
+                title = title.value,
+                description = description.value,
+                priority = priority.value
+            )
+
+            repository.deleteTask(toDoTask)
+        }
+    }
+
+    private fun deleteAllTasks(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllTasks()
+        }
     }
 
     fun handleDatabaseActions(action: Action){
@@ -76,15 +131,17 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
                 addTask()
             }
             Action.UPDATE ->{
-
+                updateTask()
             }
             Action.DELETE ->{
-
+                deleteTask()
             }
             Action.DELETE_ALL ->{
-
+                deleteAllTasks()
             }
             Action.UNDO ->{
+
+                addTask()
 
             }
             else -> {
@@ -96,6 +153,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
 
     private val _selectedTask: MutableStateFlow<ToDoTask?> = MutableStateFlow(null)
     val selectedTask: StateFlow<ToDoTask?> = _selectedTask
+
 
     fun getSelectedTask(taskId: Int) {
         viewModelScope.launch {

@@ -28,6 +28,7 @@ fun NavGraphBuilder.listComposable(
 
 
         LaunchedEffect(key1 = action) {
+
             sharedViewModel.action.value = action
         }
 
