@@ -22,7 +22,7 @@ fun PriorityItem(priority: Priority){
         Canvas(modifier = Modifier.size(PRIORITY_INDICATOR_SIZE)){
             drawCircle(color = priority.color)
         }
-        Text(modifier = Modifier.padding(LARGE_PADDING), text = priority.name, style = Typography.subtitle1, color = MaterialTheme.colors.onSurface)
+        Text(modifier = Modifier.padding(LARGE_PADDING), text = priority.name, style = Typography.subtitle2, color = MaterialTheme.colors.onSurface)
         
     }
     

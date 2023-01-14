@@ -59,7 +59,9 @@ fun ListAppBar(
             DefaultListAppBar(onSearchClicked = {
                 sharedViewModel.searchAppState.value = SearchAppBarState.OPENED
 
-            }, onSortClicked = { }, onDeleteClicked = {
+            }, onSortClicked = {
+                sharedViewModel.persistSortState(it)
+            }, onDeleteClicked = {
 
                 openDialog = true
 
