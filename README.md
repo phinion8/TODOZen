@@ -1,4 +1,4 @@
-# Project Title: To-Do App
+#To-Do App With Jetpack Compose
 
 # Description
 The To-Do App is an Android application developed using Android Studio, Jetpack Compose, and Room Database with MVVM architecture. It provides a simple and intuitive interface to help users manage their tasks efficiently. Users can create, update, and delete tasks, mark them as complete, and organize them with different categories or labels.
